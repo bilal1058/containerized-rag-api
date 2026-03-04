@@ -7,6 +7,10 @@ chroma = chromadb.PersistentClient(path="./db")
 collection = chroma.get_or_create_collection("docs")
 ollama_client = ollama.Client(host="http://host.docker.internal:11434")
 
+@app.get("/")
+def index():
+    return {"status": "ok", "message": "RAG API is running"}
+
 @app.post("/query")
 def query(q: str):
     results = collection.query(query_texts=[q], n_results=1)
@@ -14,10 +18,8 @@ def query(q: str):
 
     answer = ollama_client.generate(
     model="tinyllama",
-    prompt=f"Context:{context}\Answer clearly and concisely:"
+    prompt=f"Context:{context}Answer clearly and concisely:"
     )
-
-
     return {"answer": answer["response"]}
 
 @app.post("/add")
